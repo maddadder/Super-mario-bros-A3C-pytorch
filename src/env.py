@@ -5,7 +5,7 @@
 import gym_super_mario_bros
 from gym.spaces import Box
 from gym import Wrapper
-from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
+from nes_py.wrappers import JoypadSpace
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
 import cv2
 import numpy as np
@@ -91,7 +91,7 @@ class CustomSkipFrame(Wrapper):
 
 
 def create_train_env(world, stage, action_type, output_path=None):
-    env = gym_super_mario_bros.make("SuperMarioBros-{}-{}-v0".format(world, stage))
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     if output_path:
         monitor = Monitor(256, 240, output_path)
     else:
@@ -102,7 +102,7 @@ def create_train_env(world, stage, action_type, output_path=None):
         actions = SIMPLE_MOVEMENT
     else:
         actions = COMPLEX_MOVEMENT
-    env = BinarySpaceToDiscreteSpaceEnv(env, actions)
+    env = JoypadSpace(env, actions)
     env = CustomReward(env, monitor)
     env = CustomSkipFrame(env)
     return env, env.observation_space.shape[0], len(actions)
