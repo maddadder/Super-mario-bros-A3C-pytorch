@@ -63,7 +63,7 @@ def test(opt):
         time.sleep(0.05)
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
-            break
+            env.reset()
 
 class Namespace:
     def __init__(self, **kwargs):
