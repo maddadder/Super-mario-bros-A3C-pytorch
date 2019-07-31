@@ -42,11 +42,15 @@ def test(opt):
     model.eval()
     state = torch.from_numpy(env.reset())
     done = True
+    max_x_pos = 0
+    max_x_pos_counter = 0
     while True:
         if done:
             h_0 = torch.zeros((1, 512), dtype=torch.float)
             c_0 = torch.zeros((1, 512), dtype=torch.float)
             print('done')
+            max_x_pos = 0
+            max_x_pos_counter = 0
             env.reset()
             done = False
         else:
@@ -65,11 +69,18 @@ def test(opt):
         #print(reward)
         env.render()
         state = torch.from_numpy(state)
+        if info['x_pos'] > max_x_pos:
+            max_x_pos = info['x_pos']
+            max_x_pos_counter = 0
+        else:
+            max_x_pos_counter += 1
+        if max_x_pos_counter > 100:
+            done = True
+
         time.sleep(0.05)
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
-            env.reset()
-            done = False
+            done = True
     print('done testing')
 
 class Namespace:
