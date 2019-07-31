@@ -61,7 +61,13 @@ class CustomReward(Wrapper):
 
     def reset(self):
         self.curr_score = 0
-        return process_frame(self.env.reset())
+        frame = self.env.reset()
+        frame, reward, done, info = self.env.step(0)
+        while((info['world'] == 4 and info['stage'] == 4) or (info['world'] == 7 and info['stage'] == 4)):
+            print('skipping world',info['world'],info['stage'])
+            frame = self.env.reset()
+            frame, reward, done, info = self.env.step(0)
+        return process_frame(frame)
 
 
 class CustomSkipFrame(Wrapper):
@@ -74,6 +80,7 @@ class CustomSkipFrame(Wrapper):
         total_reward = 0
         states = []
         state, reward, done, info = self.env.step(action)
+        #self.env.render()
         for i in range(self.skip):
             if not done:
                 state, reward, done, info = self.env.step(action)
@@ -86,6 +93,11 @@ class CustomSkipFrame(Wrapper):
 
     def reset(self):
         state = self.env.reset()
+        state, reward, done, info = self.env.step(0)
+        while((info['world'] == 4 and info['stage'] == 4) or (info['world'] == 7 and info['stage'] == 4)):
+            print('skipping world',info['world'],info['stage'])
+            state = self.env.reset()
+            state, reward, done, info = self.env.step(0)
         states = np.concatenate([state for _ in range(self.skip)], 0)[None, :, :, :]
         return states.astype(np.float32)
 

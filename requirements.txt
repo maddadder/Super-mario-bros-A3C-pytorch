@@ -1,7 +1,6 @@
 gym
 numpy
 opencv-python
-tensorflow
 torch
 gym_super_mario_bros
 tensorboardX
