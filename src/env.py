@@ -94,7 +94,7 @@ class CustomSkipFrame(Wrapper):
     def reset(self):
         state = self.env.reset()
         state, reward, done, info = self.env.step(0)
-        while((info['world'] == 4 and info['stage'] == 4) or (info['world'] == 7 and info['stage'] == 4)):
+        while((info['world'] == 8 and info['stage'] == 4) or (info['world'] == 4 and info['stage'] == 4) or (info['world'] == 7 and info['stage'] == 4)):
             print('skipping world',info['world'],info['stage'])
             state = self.env.reset()
             state, reward, done, info = self.env.step(0)

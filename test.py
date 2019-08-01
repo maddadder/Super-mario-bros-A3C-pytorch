@@ -69,15 +69,21 @@ def test(opt):
         #print(reward)
         env.render()
         state = torch.from_numpy(state)
+        if max_x_pos_counter < 50:
+            time.sleep(0.06)
         if info['x_pos'] > max_x_pos:
             max_x_pos = info['x_pos']
             max_x_pos_counter = 0
         else:
             max_x_pos_counter += 1
-        if max_x_pos_counter > 100:
-            done = True
-
-        time.sleep(0.05)
+        if max_x_pos_counter > 150:
+            if info['x_pos'] < max_x_pos_counter:
+                print('must be dancing',info['x_pos'],max_x_pos_counter)
+                max_x_pos_counter = 0
+            else:
+                print('no progress, stopping')
+                done = True
+        
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
             done = True
