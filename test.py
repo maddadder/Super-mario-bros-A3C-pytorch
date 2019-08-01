@@ -14,6 +14,8 @@ import time
 import random
 from gym.envs.classic_control import rendering
 import pyglet
+from shutil import copyfile
+
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -96,6 +98,7 @@ def test(opt):
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
             done = True
+            copyfile("{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage), "{}/a3c_super_mario_bros_{}_{}_{}".format(opt.saved_path, info["world"], info["stage"],random.random()))
     print('done testing')
 
 class Namespace:
