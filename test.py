@@ -12,6 +12,8 @@ from src.model import ActorCritic
 import torch.nn.functional as F
 import time
 import random
+from gym.envs.classic_control import rendering
+import pyglet
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -26,6 +28,11 @@ def get_args():
 
 
 def test(opt):
+    viewer = rendering.SimpleImageViewer()
+    viewer.width = 800 * 3
+    viewer.height = 600 * 3
+    viewer.window = pyglet.window.Window(width=viewer.width, height=viewer.height, resizable=True)
+    
     torch.manual_seed(123)
     if opt.output_path != None:
         env, num_states, num_actions = create_train_env(opt.world, opt.stage, opt.action_type,
@@ -66,9 +73,11 @@ def test(opt):
         action = torch.argmax(policy).item()
         action = int(action)
         state, reward, done, info = env.step(action)
-        #print(reward)
-        env.render()
+        print(reward)
+        rgb = env.render('rgb_array')
         state = torch.from_numpy(state)
+        
+        viewer.imshow(rgb)
         if max_x_pos_counter < 50:
             time.sleep(0.06)
         if info['x_pos'] > max_x_pos:
