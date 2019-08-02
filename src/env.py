@@ -60,7 +60,7 @@ class CustomReward(Wrapper):
 
     def reset(self):
         self.curr_score = 0
-        return process_frame(self.env.reset())
+        return process_frame(super().reset())
 
 class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
     def __init__(self, env, rom_mode='vanilla'):
@@ -68,11 +68,12 @@ class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
 
     def _select_random_level(self):
         """Select a random level to use."""
-        world = 4
-        stage = 4
-        while((world == 4 and stage == 4) or (world == 7 and stage == 4) or (world == 8 and stage == 4)):
+        world = 4 - 1
+        stage = 4 - 1
+        while((world == (4 - 1) and stage == (4 - 1)) or (world == (7 - 1) and stage == (4 - 1)) or (world == (8 - 1) and stage == (4 - 1)) ):
             world = self.np_random.randint(1, 9) - 1
             stage = self.np_random.randint(1, 5) - 1
+        print('selecting level:',world + 1,stage + 1)
         self.env = self.envs[world][stage]
 
     def reset(self):
@@ -108,7 +109,7 @@ class CustomSkipFrame(Wrapper):
         return states.astype(np.float32), reward, done, info
 
     def reset(self):
-        state = self.env.reset()
+        state = super().reset()
         states = np.concatenate([state for _ in range(self.skip)], 0)[None, :, :, :]
         return states.astype(np.float32)
 
