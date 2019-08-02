@@ -31,8 +31,8 @@ def get_args():
 
 def test(opt):
     viewer = rendering.SimpleImageViewer()
-    viewer.width = 800 * 3
-    viewer.height = 600 * 3
+    viewer.width = 800
+    viewer.height = 600
     viewer.window = pyglet.window.Window(width=viewer.width, height=viewer.height, resizable=True)
     
     torch.manual_seed(123)
