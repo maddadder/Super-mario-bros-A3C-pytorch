@@ -70,7 +70,7 @@ class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
         """Select a random level to use."""
         world = 4 - 1
         stage = 4 - 1
-        while( (world == (2 - 1) and stage == (3 - 1)) or (world == (7 - 1) and stage == (4 - 1)) or (world == (4 - 1) and stage == (4 - 1)) or (world == (7 - 1) and stage == (4 - 1)) or (world == (8 - 1) and stage == (4 - 1)) ):
+        while( (world == (2 - 1) and stage == (3 - 1)) or (world == (7 - 1) and stage == (3 - 1)) or (world == (4 - 1) and stage == (4 - 1)) or (world == (7 - 1) and stage == (4 - 1)) or (world == (8 - 1) and stage == (4 - 1)) ):
             world = self.np_random.randint(1, 9) - 1
             stage = self.np_random.randint(1, 5) - 1
         print('selecting level:',world + 1,stage + 1)
