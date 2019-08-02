@@ -10,7 +10,7 @@ from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGH
 import cv2
 import numpy as np
 import subprocess as sp
-
+from gym_super_mario_bros import SuperMarioBrosRandomStagesEnv
 
 class Monitor:
     def __init__(self, width, height, saved_path):
@@ -33,7 +33,6 @@ def process_frame(frame):
         return frame
     else:
         return np.zeros((1, 84, 84))
-
 
 class CustomReward(Wrapper):
     def __init__(self, env=None, monitor=None):
@@ -61,15 +60,32 @@ class CustomReward(Wrapper):
 
     def reset(self):
         self.curr_score = 0
-        frame = self.env.reset()
-        frame, reward, done, info = self.env.step(0)
-        while((info['world'] == 4 and info['stage'] == 4) or (info['world'] == 7 and info['stage'] == 4)):
-            print('skipping world',info['world'],info['stage'])
-            frame = self.env.reset()
-            frame, reward, done, info = self.env.step(0)
-        return process_frame(frame)
+        return process_frame(self.env.reset())
 
+class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
+    def __init__(self, env, rom_mode='vanilla'):
+        super(CustomSuperMarioBrosRandomStagesEnv, self).__init__(rom_mode)
 
+    def _select_random_level(self):
+        """Select a random level to use."""
+        world = 4
+        stage = 4
+        while((world == 4 and stage == 4) or (world == 7 and stage == 4)):
+            world = self.np_random.randint(1, 9) - 1
+            stage = self.np_random.randint(1, 5) - 1
+        self.env = self.envs[world][stage]
+
+    def reset(self):
+        """
+        Reset the state of the environment and returns an initial observation.
+        Returns:
+            state (np.ndarray): next frame as a result of the given action
+        """
+        # select a new level
+        self._select_random_level()
+        # reset the environment
+        return self.env.reset()
+        
 class CustomSkipFrame(Wrapper):
     def __init__(self, env, skip=4):
         super(CustomSkipFrame, self).__init__(env)
@@ -93,17 +109,14 @@ class CustomSkipFrame(Wrapper):
 
     def reset(self):
         state = self.env.reset()
-        state, reward, done, info = self.env.step(0)
-        while((info['world'] == 8 and info['stage'] == 4) or (info['world'] == 4 and info['stage'] == 4) or (info['world'] == 7 and info['stage'] == 4)):
-            print('skipping world',info['world'],info['stage'])
-            state = self.env.reset()
-            state, reward, done, info = self.env.step(0)
         states = np.concatenate([state for _ in range(self.skip)], 0)[None, :, :, :]
         return states.astype(np.float32)
 
-
+       
 def create_train_env(world, stage, action_type, output_path=None):
-    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
+    #env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
+    env = gym_super_mario_bros.make("SuperMarioBros-{}-{}-v0".format(world, stage))
+    env = CustomSuperMarioBrosRandomStagesEnv(env)
     if output_path:
         monitor = Monitor(256, 240, output_path)
     else:
