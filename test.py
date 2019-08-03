@@ -15,7 +15,7 @@ import random
 from gym.envs.classic_control import rendering
 import pyglet
 from shutil import copyfile
-
+from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -75,30 +75,25 @@ def test(opt):
         action = torch.argmax(policy).item()
         action = int(action)
         state, reward, done, info = env.step(action)
-        print(reward)
         rgb = env.render('rgb_array')
         state = torch.from_numpy(state)
         
         viewer.imshow(rgb)
         if max_x_pos_counter < 50:
             time.sleep(0.06)
-        if info['x_pos'] > max_x_pos:
-            max_x_pos = info['x_pos']
-            max_x_pos_counter = 0
-        else:
+        if reward < 0:
             max_x_pos_counter += 1
+        else:
+            max_x_pos_counter = 0
         if max_x_pos_counter > 150:
-            if info['x_pos'] < max_x_pos_counter:
-                print('must be dancing',info['x_pos'],max_x_pos_counter)
-                max_x_pos_counter = 0
-            else:
-                print('no progress, stopping')
-                done = True
+            print('no progress, stopping')
+            done = True
         
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
             done = True
             copyfile("{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage), "{}/a3c_super_mario_bros_{}_{}_{}".format(opt.saved_path, info["world"], info["stage"],random.random()))
+        print(reward,COMPLEX_MOVEMENT[action])
     print('done testing')
 
 class Namespace:
