@@ -53,6 +53,7 @@ def test(opt):
     done = True
     max_x_pos = 0
     max_x_pos_counter = 0
+    rand_counter = 0
     while True:
         if done:
             h_0 = torch.zeros((1, 512), dtype=torch.float)
@@ -60,6 +61,7 @@ def test(opt):
             print('done')
             max_x_pos = 0
             max_x_pos_counter = 0
+            rand_counter = 0
             env.reset()
             done = False
         else:
@@ -74,6 +76,10 @@ def test(opt):
         policy = F.softmax(logits, dim=1)
         action = torch.argmax(policy).item()
         action = int(action)
+        if rand_counter > 25: #mario is stuck
+            action = env.action_space.sample()
+        if rand_counter > 50: #mario is maybe not stuck?
+            rand_counter = 0
         state, reward, done, info = env.step(action)
         rgb = env.render('rgb_array')
         state = torch.from_numpy(state)
@@ -83,8 +89,10 @@ def test(opt):
             time.sleep(0.06)
         if reward < 0:
             max_x_pos_counter += 1
+            rand_counter += 1
         else:
             max_x_pos_counter = 0
+            rand_counter = 0
         if max_x_pos_counter > 150:
             print('no progress, stopping')
             done = True

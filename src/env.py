@@ -41,12 +41,17 @@ class CustomReward(Wrapper):
         self.curr_score = 0
         self.max_x_pos = 0
         self.max_x_pos_counter = 0
+        self.rand_counter = 0
         if monitor:
             self.monitor = monitor
         else:
             self.monitor = None
 
     def step(self, action):
+        if self.rand_counter > 25: #mario is stuck
+            action = self.env.action_space.sample()
+        if self.rand_counter > 50: #mario is maybe not stuck?
+            self.rand_counter = 0
         state, reward, done, info = self.env.step(action)
         if self.monitor:
             self.monitor.record(state)
@@ -56,6 +61,7 @@ class CustomReward(Wrapper):
         if done:
             self.max_x_pos = 0
             self.max_x_pos_counter = 0
+            self.rand_counter = 0
             if info["flag_get"]:
                 reward += 50
             else:
@@ -63,18 +69,18 @@ class CustomReward(Wrapper):
         if info['x_pos'] > self.max_x_pos:
             self.max_x_pos = info['x_pos']
             self.max_x_pos_counter = 0
+            self.rand_counter = 0
         else:
             self. max_x_pos_counter += 1
-            if self.max_x_pos_counter > 150:
+            if self.max_x_pos_counter > 275:
                 reward -= 1
-        if self.max_x_pos_counter > 150:
-            if action == 6 or action == 7 or action == 8 or action == 9:
-                self.max_x_pos_counter = 0
+                self.rand_counter += 1
         return state, reward / 10., done, info
 
     def reset(self):
         self.curr_score = 0
         self.max_x_pos_counter = 0
+        self.rand_counter = 0
         self.max_x_pos = 0
         return process_frame(super().reset())
 
