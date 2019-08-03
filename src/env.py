@@ -48,11 +48,15 @@ class CustomReward(Wrapper):
             self.monitor = None
 
     def step(self, action):
+        done = False
         if self.rand_counter > 25: #mario is stuck
-            action = self.env.action_space.sample()
-        if self.rand_counter > 50: #mario is maybe not stuck?
+            for x in range(0, 2):
+                state, reward, done, info = self.env.step(self.env.action_space.sample())
+                if done:
+                    break
             self.rand_counter = 0
-        state, reward, done, info = self.env.step(action)
+        if done == False:
+            state, reward, done, info = self.env.step(action)
         if self.monitor:
             self.monitor.record(state)
         state = process_frame(state)
@@ -72,7 +76,7 @@ class CustomReward(Wrapper):
             self.rand_counter = 0
         else:
             self. max_x_pos_counter += 1
-            if self.max_x_pos_counter > 275:
+            if self.max_x_pos_counter > 50:
                 reward -= 1
                 self.rand_counter += 1
         return state, reward / 10., done, info
@@ -92,7 +96,7 @@ class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
         """Select a random level to use."""
         world = 4 - 1
         stage = 4 - 1
-        while( (world == (2 - 1) and stage == (3 - 1)) or (world == (7 - 1) and stage == (3 - 1)) or (world == (4 - 1) and stage == (4 - 1)) or (world == (7 - 1) and stage == (4 - 1)) or (world == (8 - 1) and stage == (4 - 1)) ):
+        while( (world == (4 - 1) and stage == (4 - 1)) or (world == (7 - 1) and stage == (4 - 1)) ):
             world = self.np_random.randint(1, 9) - 1
             stage = self.np_random.randint(1, 5) - 1
         print('selecting level:',world + 1,stage + 1)

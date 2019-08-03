@@ -1,0 +1,3 @@
+call activate ptorch
+cd C:\tensorflow1\Super-mario-bros-A3C-pytorch
+python test.py --saved_path test_models
