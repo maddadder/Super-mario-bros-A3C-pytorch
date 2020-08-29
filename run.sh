@@ -1,3 +1,6 @@
+cd /media/tb2/mario/Super-mario-bros-A3C-pytorch
+source .env/bin/activate
+
 while [ 1 == 1 ]
 do
     cp trained_models/a3c_super_mario_bros_1_1 test_models
