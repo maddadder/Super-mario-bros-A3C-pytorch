@@ -54,6 +54,7 @@ def test(opt):
     done = True
     max_x_pos = 0
     max_x_pos_counter = 0
+    model_file_name = ""
     while True:
         if done:
             h_0 = torch.zeros((1, 512), dtype=torch.float)
@@ -62,6 +63,17 @@ def test(opt):
             max_x_pos = 0
             max_x_pos_counter = 0
             env.reset()
+            if torch.cuda.is_available():
+                model_file_name = "{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, env.world + 1, env.stage + 1)
+                if os.path.isfile(model_file_name):
+                    model.load_state_dict(torch.load(model_file_name))
+                    model.cuda()
+            else:
+                model_file_name = "{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, env.world + 1, env.stage + 1)
+                if os.path.isfile(model_file_name):
+                    model.load_state_dict(torch.load(model_file_name))
+                model.load_state_dict(torch.load(model_file_name,
+                                                map_location=lambda storage, loc: storage))
             done = False
         else:
             h_0 = h_0.detach()
@@ -91,8 +103,8 @@ def test(opt):
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
             done = True
-            copyfile("{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage), "{}/a3c_super_mario_bros_{}_{}_{}".format(opt.saved_path, info["world"], info["stage"],random.random()))
-        print(reward,COMPLEX_MOVEMENT[action])
+            #copyfile("{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage), "{}/a3c_super_mario_bros_{}_{}_{}".format(opt.saved_path, info["world"], info["stage"],random.random()))
+        print(model_file_name,reward,COMPLEX_MOVEMENT[action])
     print('done testing')
 
 class Namespace:

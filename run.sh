@@ -1,5 +1,5 @@
-cd /media/tb2/mario/Super-mario-bros-A3C-pytorch
-source .env/bin/activate
+#cd /media/tb2/mario/Super-mario-bros-A3C-pytorch
+source ./env/bin/activate
 
 while [ 1 == 1 ]
 do
