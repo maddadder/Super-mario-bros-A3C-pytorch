@@ -26,13 +26,15 @@ def get_args():
     parser.add_argument('--beta', type=float, default=0.01, help='entropy coefficient')
     parser.add_argument("--num_local_steps", type=int, default=50)
     parser.add_argument("--num_global_steps", type=int, default=5e6)
-    parser.add_argument("--num_processes", type=int, default=2)
+    parser.add_argument("--num_processes", type=int, default=1)
     parser.add_argument("--save_interval", type=int, default=500, help="Number of steps between savings")
     parser.add_argument("--max_actions", type=int, default=200, help="Maximum repetition steps in test phase")
     parser.add_argument("--log_path", type=str, default="tensorboard/a3c_super_mario_bros")
     parser.add_argument("--saved_path", type=str, default="trained_models")
     parser.add_argument("--load_from_previous_stage", type=bool, default=True,
                         help="Load weight from previous trained stage")
+    parser.add_argument("--render_training", type=bool, default=True,
+                        help="Show the training environment")
     parser.add_argument("--use_gpu", type=bool, default=True)
     args = parser.parse_args()
     return args
@@ -60,9 +62,9 @@ def train(opt):
     processes = []
     for index in range(opt.num_processes):
         if index == 0:
-            process = mp.Process(target=local_train, args=(index, opt, global_model, optimizer, True))
+            process = mp.Process(target=local_train, args=(index, opt, global_model, optimizer, True, opt.render_training))
         else:
-            process = mp.Process(target=local_train, args=(index, opt, global_model, optimizer))
+            process = mp.Process(target=local_train, args=(index, opt, global_model, optimizer, False, opt.render_training))
         process.start()
         processes.append(process)
     #process = mp.Process(target=local_test, args=(opt.num_processes, opt, global_model))

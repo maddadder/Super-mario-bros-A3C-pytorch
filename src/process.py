@@ -10,9 +10,17 @@ from torch.distributions import Categorical
 from collections import deque
 from tensorboardX import SummaryWriter
 import timeit
+import pyglet
+from gym.envs.classic_control import rendering
 
-
-def local_train(index, opt, global_model, optimizer, save=False):
+def local_train(index, opt, global_model, optimizer, save=False, render_training=False):
+    viewer = None
+    if render_training:
+        viewer = rendering.SimpleImageViewer()
+        viewer.width = 800 * 2
+        viewer.height = 600 * 2
+        #1920x1080
+        viewer.window = pyglet.window.Window(width=viewer.width, height=viewer.height, resizable=True)
     torch.manual_seed(123 + index)
     if save:
         start_time = timeit.default_timer()
@@ -62,6 +70,9 @@ def local_train(index, opt, global_model, optimizer, save=False):
             action = m.sample().item()
 
             state, reward, done, _ = env.step(action)
+            if render_training:
+                rgb = env.render("rgb_array")
+                viewer.imshow(rgb)
             state = torch.from_numpy(state)
             if opt.use_gpu:
                 state = state.cuda()
