@@ -90,6 +90,8 @@ class CustomReward(Wrapper):
 
 class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
     def __init__(self, env, rom_mode='vanilla'):
+        self.stage = 0
+        self.world = 0
         super(CustomSuperMarioBrosRandomStagesEnv, self).__init__(rom_mode)
 
     def _select_random_level(self):
@@ -102,6 +104,19 @@ class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
         print('selecting level:',self.world + 1,self.stage + 1)
         self.env = self.envs[self.world][self.stage]
 
+    def _select_next_level(self):
+        """Select the next level to use."""
+        self.stage += 1
+        if self.stage > 3:
+            self.stage = 0
+            self.world += 1
+        if self.world > 7:
+            self.stage = 0
+            self.world = 0
+        print(self.world, self.stage)
+        print('selecting level:',self.world + 1,self.stage + 1)
+        self.env = self.envs[self.world][self.stage]
+
     def reset(self):
         """
         Reset the state of the environment and returns an initial observation.
@@ -109,7 +124,8 @@ class CustomSuperMarioBrosRandomStagesEnv(SuperMarioBrosRandomStagesEnv):
             state (np.ndarray): next frame as a result of the given action
         """
         # select a new level
-        self._select_random_level()
+        #self._select_random_level()
+        self._select_next_level()
         # reset the environment
         return self.env.reset()
         

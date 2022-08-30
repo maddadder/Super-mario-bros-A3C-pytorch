@@ -12,6 +12,7 @@ from tensorboardX import SummaryWriter
 import timeit
 import pyglet
 from gym.envs.classic_control import rendering
+import os
 
 def local_train(index, opt, global_model, optimizer, save=False, render_training=False):
     viewer = None
@@ -37,13 +38,18 @@ def local_train(index, opt, global_model, optimizer, save=False, render_training
     curr_step = 0
     curr_episode = 0
     while True:
-        if save:
-            if curr_episode % opt.save_interval == 0 and curr_episode > 0:
-                torch.save(global_model.state_dict(),
-                           "{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, opt.world, opt.stage))
-            print("Process {}. Episode {}".format(index, curr_episode))
+        print("Process {}. Episode {}".format(index, curr_episode))
         curr_episode += 1
-        local_model.load_state_dict(global_model.state_dict())
+        my_model_file_name = "{}/a3c_super_mario_bros_{}_{}".format("my_" + opt.saved_path, env.world + 1, env.stage + 1)
+        model_file_name = "{}/a3c_super_mario_bros_{}_{}".format(opt.saved_path, env.world + 1, env.stage + 1)
+        if os.path.isfile(my_model_file_name):
+            local_model.load_state_dict(torch.load(my_model_file_name))
+            global_model = local_model
+        elif os.path.isfile(model_file_name):
+            local_model.load_state_dict(torch.load(model_file_name))
+            global_model = local_model
+        else:
+            local_model.load_state_dict(global_model.state_dict())
         if done:
             h_0 = torch.zeros((1, 512), dtype=torch.float)
             c_0 = torch.zeros((1, 512), dtype=torch.float)
@@ -81,6 +87,10 @@ def local_train(index, opt, global_model, optimizer, save=False, render_training
 
             if done:
                 curr_step = 0
+                if save:
+                    #if curr_episode % opt.save_interval == 0 and curr_episode > 0:
+                    torch.save(global_model.state_dict(),
+                           "{}/a3c_super_mario_bros_{}_{}".format("my_" + opt.saved_path, env.world + 1, env.stage + 1))
                 state = torch.from_numpy(env.reset())
                 if opt.use_gpu:
                     state = state.cuda()
