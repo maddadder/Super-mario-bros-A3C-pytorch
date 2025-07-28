@@ -1,8 +1,7 @@
-gym==0.21.0
-numpy
+numpy<2.0
 opencv-python
-torch
-torchvision
-gym_super_mario_bros
+torch==2.2.0
+torchvision==0.17.0
 tensorboardX
-
+gym
+gym_super_mario_bros==7.4.0
