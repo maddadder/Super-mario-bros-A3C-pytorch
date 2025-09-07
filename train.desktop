@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Pet Detector
+Icon=utilities-terminal   # you can replace this with any .png/.svg you like
+Exec=gnome-terminal -- bash -c "/home/alice/git3/Super-mario-bros-A3C-pytorch/train.sh; exec bash"
+Terminal=false            # we launch our own terminal, so keep this false
+Categories=Utility;
+
